@@ -4,31 +4,15 @@
 //import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 //import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 //import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-//import com.xha.domain.ResponseResult;
-//import com.xha.domain.dto.RoleDto;
-//import com.xha.domain.entity.Role;
-//import com.xha.domain.entity.RoleMenu;
-//import com.xha.domain.vo.AdminRoleVo;
-//import com.xha.domain.vo.RoleVo;
-//import com.xha.mapper.RoleMapper;
-//import com.xha.mapper.RoleMenuMapper;
-//import com.xha.service.RoleMenuService;
-//import com.xha.service.RoleService;
-//import com.xha.utils.BeanCopyPropertiesUtils;
 //import org.springframework.context.annotation.Lazy;
 //import org.springframework.stereotype.Service;
 //import org.springframework.util.StringUtils;
-//
 //import javax.annotation.Resource;
 //import java.util.List;
 //import java.util.Objects;
 //
-//import static com.xha.enums.AppHttpCodeEnum.*;
-//
 ///**
-// * @author Tony贾维斯
 // * @description 针对表【sys_role(角色信息表)】的数据库操作Service实现
-// * @createDate 2022-11-11 11:57:47
 // */
 //@Service
 //public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>

@@ -6,13 +6,8 @@
 //import com.aliyun.oss.OSSClientBuilder;
 //import com.aliyun.oss.OSSException;
 //import com.aliyun.oss.model.ObjectMetadata;
-//import com.xha.domain.ResponseResult;
-//import com.xha.service.UploadService;
-//import com.xha.utils.ImgUtils;
-//import com.xha.utils.OssUtils;
 //import org.springframework.stereotype.Service;
 //import org.springframework.web.multipart.MultipartFile;
-//
 //import java.io.IOException;
 //import java.io.InputStream;
 //

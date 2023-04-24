@@ -7,13 +7,16 @@ import com.blog.domain.vo.CommentVo;
 import com.blog.domain.vo.PageVo;
 import com.blog.mapper.CommentMapper;
 import com.blog.service.CommentService;
+import com.blog.service.UserService;
 import com.blog.utils.BeanCopyPropertiesUtils;
 import com.blog.utils.ResponseResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.blog.constants.CommonConstants.ROOT_ID;
 
@@ -23,6 +26,9 @@ import static com.blog.constants.CommonConstants.ROOT_ID;
  */
 @Service
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
+    @Resource
+    private UserService userService;
+
     @Override
     public ResponseResult getCommentList(String commentType, Long articleId, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum , pageSize);
@@ -30,15 +36,13 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Comment::getArticleId,articleId).eq(Comment::getRootId,ROOT_ID);
         List<Comment> list = list(queryWrapper);
-        List<CommentVo> commentVos = BeanCopyPropertiesUtils.copyBeanList(list, CommentVo.class);
+        List<CommentVo> commentVos = toCommentListVo(list);
         PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentVos);
         PageVo pageVo = new PageVo(commentVoPageInfo.getList(), commentVoPageInfo.getTotal());
         return ResponseResult.okResult(pageVo);
     }
 
-//
-//    @Resource
-//    private UserService userService;
+
 //
 //    /**
 //     * 查询评论
@@ -81,7 +85,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 //
 //    /**
 //     * 添加评论
-//     *
 //     * @param comment
 //     * @return
 //     */
@@ -96,32 +99,31 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 //    }
 //
 //
-//    /**
-//     * 将Comment对象封装为CommentVo对象，
-//     * 并根据createBy（创建评论人id）查询用户昵称赋值给Nickname
-//     * 查询子评论的用户昵称赋值给Nickname
-//     * @param list
-//     * @return
-//     */
-//    private List<CommentVo> toCommentListVo(List<Comment> list) {
-//        List<CommentVo> commentVos = BeanCopyPropertiesUtils.copyBeanList(list, CommentVo.class);
-////        遍历Vo集合
-//        commentVos.stream().map(commentVo -> {
-//            //            通过createBy（创建评论人id）查询用户昵称
-//            String nickname = userService.getById(commentVo.getCreateBy()).getNickName();
-////            将查询到的创建评论的用户昵称复制给commentVo对象
-//            commentVo.setUsername(nickname);
-//
-////            如果toCommentUserId不为-1表示为子评论
-////            通过toCommentUserId查询回复评论的用户的昵称并赋值
-//            if (commentVo.getToCommentUserId() != -1) {
-//                String commentUserName = userService.getById(commentVo.getToCommentUserId()).getNickName();
-//                commentVo.setToCommentUserName(commentUserName);
-//            }
-//            return commentVo;
-//        }).collect(Collectors.toList());
-//        return commentVos;
-//    }
+    /**
+     * 将Comment对象封装为CommentVo对象，
+     * 并根据createBy（创建评论人id）查询用户昵称赋值给Nickname
+     * 查询子评论的用户昵称赋值给Nickname
+     * @param list
+     * @return
+     */
+    private List<CommentVo> toCommentListVo(List<Comment> list) {
+        List<CommentVo> commentVos = BeanCopyPropertiesUtils.copyBeanList(list, CommentVo.class);
+        //遍历Vo集合
+        commentVos.stream().map(commentVo -> {
+            //通过createBy（创建评论人id）查询用户昵称
+            String nickname = userService.getById(commentVo.getCreateBy()).getNickName();
+            //将查询到的创建评论的用户昵称复制给commentVo对象
+            commentVo.setUsername(nickname);
+            //如果toCommentUserId不为-1表示为子评论
+            //通过toCommentUserId查询回复评论的用户的昵称并赋值
+            if (commentVo.getToCommentUserId() != -1) {
+                String commentUserName = userService.getById(commentVo.getToCommentUserId()).getNickName();
+                commentVo.setToCommentUserName(commentUserName);
+            }
+            return commentVo;
+        }).collect(Collectors.toList());
+        return commentVos;
+    }
 //
 //    /**
 //     * 根据根评论rootId查询对应的子评论的集合

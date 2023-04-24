@@ -3,38 +3,15 @@
 //import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 //import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 //import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-//import com.xha.domain.ResponseResult;
-//import com.xha.domain.dto.AdminUserDto;
-//import com.xha.domain.dto.UserInfoDto;
-//import com.xha.domain.entity.*;
-//import com.xha.domain.vo.*;
-//import com.xha.enums.AppHttpCodeEnum;
-//import com.xha.exception.SystemException;
-//import com.xha.mapper.MenuMapper;
-//import com.xha.mapper.RoleMapper;
-//import com.xha.mapper.UserMapper;
-//import com.xha.service.AdminUserService;
-//import com.xha.service.RoleService;
-//import com.xha.service.UserRoleService;
-//import com.xha.service.UserService;
-//import com.xha.utils.BeanCopyPropertiesUtils;
-//import com.xha.utils.JwtUtils;
-//import com.xha.utils.RedisCache;
-//import com.xha.utils.SecurityUtils;
 //import org.springframework.security.authentication.AuthenticationManager;
 //import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 //import org.springframework.security.core.Authentication;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 //import org.springframework.stereotype.Service;
 //import org.springframework.util.StringUtils;
-//
 //import javax.annotation.Resource;
 //import java.util.*;
 //import java.util.stream.Collectors;
-//
-//import static com.xha.constants.CommonConstants.*;
-//import static com.xha.constants.RedisConstants.ADMIN_USER_LOGIN;
-//import static com.xha.enums.AppHttpCodeEnum.*;
 //
 //@Service
 //public class AdminUserServiceImpl implements AdminUserService {
