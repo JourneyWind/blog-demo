@@ -1,23 +1,17 @@
 package com.blog.controller;
 
-
+import com.blog.domain.dto.AddCommentDto;
+import com.blog.domain.entity.Comment;
 import com.blog.service.CommentService;
+import com.blog.utils.BeanCopyPropertiesUtils;
 import com.blog.utils.ResponseResult;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 import static com.blog.constants.CommonConstants.ARTICLE_COMMENT;
 
 @RestController
 @RequestMapping("/comment")
-@Api(tags = "评论", description = "评论相关接口")
 public class CommentController {
     @Resource
     private CommentService commentService;
@@ -30,29 +24,21 @@ public class CommentController {
      * @return
      */
     @GetMapping("/commentList")
-    @ApiOperation(value = "查询评论", notes = "获取文章评论")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "articleId",value = "文章id"),
-            @ApiImplicitParam(name = "pageNum",value = "当前页"),
-            @ApiImplicitParam(name = "pageSize",value = "每页显示的条数")
-        }
-    )
     public ResponseResult getCommentList(Long articleId, Integer pageNum, Integer pageSize) {
         return commentService.getCommentList(ARTICLE_COMMENT, articleId, pageNum, pageSize);
     }
 
-//    /**
-//     * 添加评论
-//     *
-//     * @param addCommentDto
-//     * @return
-//     */
-//    @PostMapping("/addComment")
-//    public ResponseResult addComment(@RequestBody AddCommentDto addCommentDto) {
-////        将AddCommentDto类型转换为Comment类型
-//        Comment comment = BeanCopyPropertiesUtils.copyBean(addCommentDto, Comment.class);
-//        return commentService.addComment(comment);
-//    }
+    /**
+     * 添加评论
+     * @param addCommentDto
+     * @return
+     */
+    @PostMapping
+    public ResponseResult addComment(@RequestBody AddCommentDto addCommentDto) {
+        //将AddCommentDto类型转换为Comment类型
+        Comment comment = BeanCopyPropertiesUtils.copyBean(addCommentDto, Comment.class);
+        return commentService.addComment(comment);
+    }
 //
 //    /**
 //     * 查询友链评论

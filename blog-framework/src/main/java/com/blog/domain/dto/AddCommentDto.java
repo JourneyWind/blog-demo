@@ -1,10 +1,6 @@
 package com.blog.domain.dto;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,14 +10,11 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel(description = "添加评论dto")
 public class AddCommentDto {
     private Long id;
     //评论类型（0代表文章评论，1代表友链评论）
-    @ApiModelProperty(notes = "评论类型（0代表文章评论，1代表友链评论）")
     private String type;
     //文章id
-    @ApiModelProperty(notes = "文章id")
     private Long articleId;
     //根评论id
     private Long rootId;

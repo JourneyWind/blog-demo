@@ -13,5 +13,5 @@ public interface CommentService extends IService<Comment> {
 
     ResponseResult getCommentList(String commentType, Long articleId, Integer pageNum, Integer pageSize);
 
-//    ResponseResult addComment(Comment comment);
+    ResponseResult addComment(Comment comment);
 }

@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.domain.entity.Comment;
 import com.blog.domain.vo.CommentVo;
 import com.blog.domain.vo.PageVo;
+import com.blog.enums.AppHttpCodeEnum;
+import com.blog.exception.SystemException;
 import com.blog.mapper.CommentMapper;
 import com.blog.service.CommentService;
 import com.blog.service.UserService;
@@ -13,6 +15,7 @@ import com.blog.utils.ResponseResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -31,19 +34,40 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Override
     public ResponseResult getCommentList(String commentType, Long articleId, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum , pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         //查询对应文章根评论
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Comment::getArticleId,articleId).eq(Comment::getRootId,ROOT_ID);
+        queryWrapper.eq(Comment::getArticleId, articleId).eq(Comment::getRootId, ROOT_ID);
         List<Comment> list = list(queryWrapper);
+        //将Comment对象封装为CommentVo对象并查询用户昵称赋值给username
         List<CommentVo> commentVos = toCommentListVo(list);
+        //查询所有根评论对应子评论集合，并赋值
+        for (CommentVo commentVo : commentVos) {
+            List<CommentVo> children = getChildren(commentVo.getId());
+            commentVo.setChildren(children);
+        }
         PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentVos);
         PageVo pageVo = new PageVo(commentVoPageInfo.getList(), commentVoPageInfo.getTotal());
         return ResponseResult.okResult(pageVo);
     }
 
+    /**
+     * 添加评论
+     * @param comment
+     * @return
+     */
+    public ResponseResult addComment(Comment comment) {
+        //1.字段填充功能已经在MyMetaObjectHandler实现
+        //2.判断评论内容是否为空
+        if (!StringUtils.hasText(comment.getContent())) {
+            throw new SystemException(AppHttpCodeEnum.CONTENT_NOT_NULL);
+        }
+        save(comment);
+        return ResponseResult.okResult();
+    }
 
-//
+
+
 //    /**
 //     * 查询评论
 //     * @param commentType
@@ -83,26 +107,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 //
 //    }
 //
-//    /**
-//     * 添加评论
-//     * @param comment
-//     * @return
-//     */
-//    public ResponseResult addComment(Comment comment) {
-////        1.字段填充功能已经在MyMetaObjectHandler实现
-////        2.判断评论内容是否为空
-//        if (!StringUtils.hasText(comment.getContent())) {
-//            throw new SystemException(AppHttpCodeEnum.COMMENT_NOT_NULL);
-//        }
-//        save(comment);
-//        return null;
-//    }
-//
-//
     /**
      * 将Comment对象封装为CommentVo对象，
      * 并根据createBy（创建评论人id）查询用户昵称赋值给Nickname
      * 查询子评论的用户昵称赋值给Nickname
+     *
      * @param list
      * @return
      */
@@ -124,19 +133,21 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         }).collect(Collectors.toList());
         return commentVos;
     }
-//
-//    /**
-//     * 根据根评论rootId查询对应的子评论的集合
-//     *
-//     * @param id
-//     * @return
-//     */
-//    private List<CommentVo> getChildren(Long id) {
-//        LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
-//        queryWrapper.eq(Comment::getRootId, id);
-////        按照创建时间进行降序排序
-//        queryWrapper.orderByAsc(Comment::getCreateTime);
-//        List<Comment> lists = list(queryWrapper);
-//        List<CommentVo> commentVos = toCommentListVo(lists);
-//        return commentVos;
+
+    /**
+     * 根据根评论rootId查询对应的子评论的集合
+     *
+     * @param id
+     * @return
+     */
+    private List<CommentVo> getChildren(Long id) {
+        LambdaQueryWrapper<Comment> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Comment::getRootId, id);
+        //按照创建时间进行降序排序
+        wrapper.orderByAsc(Comment::getCreateTime);
+        List<Comment> list = list(wrapper);
+        List<CommentVo> commentVos = toCommentListVo(list);
+        return commentVos;
     }
+
+}
