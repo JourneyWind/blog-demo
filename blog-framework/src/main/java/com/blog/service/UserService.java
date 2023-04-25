@@ -11,13 +11,9 @@ import com.blog.utils.ResponseResult;
 
 public interface UserService extends IService<User> {
 
-//    ResponseResult userLogin(User user);
-//
-//    ResponseResult userLogout();
-//
     ResponseResult userInfo();
-//
-//    ResponseResult updateUserInfo(User user);
-//
-//    ResponseResult userRegister(User user);
+
+    ResponseResult updateUserInfo(User user);
+
+    ResponseResult userRegister(User user);
 }

@@ -2,15 +2,20 @@ package com.blog.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.blog.constants.CommonConstants;
+import com.blog.domain.entity.LoginUser;
 import com.blog.domain.entity.User;
 import com.blog.domain.vo.UserInfoVo;
+import com.blog.enums.AppHttpCodeEnum;
 import com.blog.mapper.UserMapper;
 import com.blog.service.UserService;
 import com.blog.utils.BeanCopyPropertiesUtils;
+import com.blog.utils.RedisCache;
 import com.blog.utils.ResponseResult;
 import com.blog.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 
 
 /**
@@ -20,7 +25,8 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>implements UserService {
 //    @Resource
 //    private BCryptPasswordEncoder passwordEncoder;
-//
+    @Resource
+    private RedisCache redisCache;
 
     @Override
     public ResponseResult userInfo() {
@@ -29,12 +35,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>implements Use
         return ResponseResult.okResult(userInfoVo);
     }
 
+    @Override
+    public ResponseResult updateUserInfo(User user) {
+        boolean b = updateById(user);
+        if (!b) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.UPDATE_USERINFO_ERR);
+        }
+        //删除缓存
+        redisCache.deleteObject(CommonConstants.BLOG_USER_TOKEN_KEY + user.getId());
+        //查询新的用户信息
+        User newUser = getById(user.getId());
+        //存入redis
+        LoginUser loginUser = new LoginUser(newUser);
+        redisCache.setCacheObject(CommonConstants.BLOG_USER_TOKEN_KEY + user.getId(),loginUser);
+        return ResponseResult.okResult();
+    }
 
-//    /**
-//     * 用户注册
-//     * @return
-//     * @param user
-//     */
+    /**
+     * 用户注册
+     */
+    @Override
+    public ResponseResult userRegister(User user) {
+        return null;
+    }
+
+
+
 
 //    @Override
 //    public ResponseResult userRegister(User user) {
@@ -63,45 +89,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>implements Use
 //        return ResponseResult.okResult();
 //    }
 //
-//
-//
-//    /**
-//     * 查询用户信息
-//     *
-//     * @return
-//     */
-//    @Override
-//    public ResponseResult getUserInfo() {
-////        1.获取到当前用户信息
-//        Long userId = SecurityUtils.getUserId();
-//        User user = getById(userId);
-////        2.将User对象封装为UserInfoVo对象
-//        UserInfoVo userInfo = BeanCopyPropertiesUtils.copyBean(user, UserInfoVo.class);
-//        return ResponseResult.okResult(userInfo);
-//    }
-//
-//    /**
-//     * 用户修改信息
-//     *
-//     * @param user
-//     * @return
-//     */
-//    @Override
-//    public ResponseResult updateUserInfo(User user) {
-////        1.更新数据库
-//        boolean result = updateById(user);
-//        if (Objects.isNull(result)) {
-//            return ResponseResult.errorResult(408, "更新失败");
-//        }
-////        2.删除缓存
-//        redisCache.deleteObject(BLOG_USER_LOGIN + user.getId());
-////        3.查询新的用户信息
-//        User newUser = getById(user.getId());
-//        LoginUser loginUser = new LoginUser(newUser,null);
-////        4.将用户信息存入缓存
-//        redisCache.setCacheObject(BLOG_USER_LOGIN + user.getId(), loginUser);
-//        return ResponseResult.okResult();
-//    }
 //
 //    /**
 //     * 判断用户名是否存在

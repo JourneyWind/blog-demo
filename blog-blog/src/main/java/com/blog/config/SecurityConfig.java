@@ -35,7 +35,7 @@ public class SecurityConfig {
         security.authorizeRequests()
                 //对于登录接口 允许匿名访问
                 .antMatchers("/login").anonymous()
-                .antMatchers("/logout").authenticated()
+                .antMatchers("/logout","/user/userInfo","/comment","/upload").authenticated()
                 //对于其他请求全部允许访问
                 .anyRequest().permitAll();
         security.csrf().disable();

@@ -39,7 +39,8 @@ mybatis-plus:
 
 
 
-#oss:
-#  accessKey: daddasd
-#  secretKey: weqeqwe
-#  bucket: sg-blog
+oss:
+  accessKey: 3-aE8yi3F8ciNSEUXQJ1KZwPWtW3vgah2H5AjktU
+  secretKey: ftp0NJ98uELM-Pot46gXWvZKs9lqSz-AWOs_tMku
+  bucket: journeywind-blog
+  cdnUrlPre: http://rtogzukek.hd-bkt.clouddn.com/
