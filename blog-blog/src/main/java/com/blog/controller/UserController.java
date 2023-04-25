@@ -1,5 +1,7 @@
 package com.blog.controller;
 
+import com.blog.service.UserService;
+import com.blog.utils.ResponseResult;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -7,13 +9,17 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-//
-//    @Resource
-//    private UserService userService;
-//
+    @Resource
+    private UserService userService;
+
+
+    @GetMapping("/userInfo")
+    public ResponseResult userInfo(){
+        return userService.userInfo();
+    }
+
 //    /**
 //     * 用户注册
-//     * @return
 //     */
 //    @PostMapping("/register")
 //    public ResponseResult userRegister(@RequestBody User user) {

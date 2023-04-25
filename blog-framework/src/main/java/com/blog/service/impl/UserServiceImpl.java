@@ -1,14 +1,16 @@
 package com.blog.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.domain.entity.User;
+import com.blog.domain.vo.UserInfoVo;
 import com.blog.mapper.UserMapper;
 import com.blog.service.UserService;
+import com.blog.utils.BeanCopyPropertiesUtils;
+import com.blog.utils.ResponseResult;
+import com.blog.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import javax.annotation.Resource;
-import java.util.Objects;
+
 
 
 /**
@@ -16,16 +18,18 @@ import java.util.Objects;
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>implements UserService {
-
-//    @Resource
-//    private AuthenticationManager authenticationManager;
-//
-//    @Resource
-//    private RedisCache redisCache;
-//
 //    @Resource
 //    private BCryptPasswordEncoder passwordEncoder;
 //
+
+    @Override
+    public ResponseResult userInfo() {
+        User user = SecurityUtils.getLoginUser().getUser();
+        UserInfoVo userInfoVo = BeanCopyPropertiesUtils.copyBean(user, UserInfoVo.class);
+        return ResponseResult.okResult(userInfoVo);
+    }
+
+
 //    /**
 //     * 用户注册
 //     * @return
@@ -59,54 +63,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>implements Use
 //        return ResponseResult.okResult();
 //    }
 //
-//    /**
-//     * 用户登录
-//     *
-//     * @return
-//     */
-//    @Override
-//    public ResponseResult userLogin(User user) {
-////        1.根据username和password封装Authentication对象
-//        UsernamePasswordAuthenticationToken authenticationToken =
-//                new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword());
-////        2.AuthenticationManager调用authenticate方法，再调用UserDetailsService的loadUserByUsername方法
-//        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-////        3.判断认证是否通过
-//        if (Objects.isNull(authenticate)) {
-//            throw new RuntimeException("用户名或密码错误！");
-//        }
-////        4.获取到用户id
-//        LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
-//        String userId = loginUser.getUser().getId().toString();
-////          4.1生成JWT
-//        String jwt = JwtUtils.createJWT(userId);
 //
-////        5.将用户信息存入缓存
-//        redisCache.setCacheObject(BLOG_USER_LOGIN + userId, loginUser);
-////        6.将User对象转换为UserInfo对象
-//        UserInfoVo userInfoVo = BeanCopyPropertiesUtils.copyBean(loginUser.getUser(), UserInfoVo.class);
-////        7.将UserInfo对象封装为BlogUserLoginVo对象
-//        BlogUserLoginVo blogUserLoginVo = new BlogUserLoginVo(jwt, userInfoVo);
-////        7.将token和用户信息封装返回
-//        return ResponseResult.okResult(blogUserLoginVo);
-//    }
-//
-//
-//    /**
-//     * 用户退出
-//     *
-//     * @return
-//     */
-//    public ResponseResult userLogout() {
-////        1.获取到SecurityContextHolder中的LoginUser对象
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-////        2.获取到userId
-//        Long userId = loginUser.getUser().getId();
-////        3.中redis中删除缓存
-//        redisCache.deleteObject(BLOG_USER_LOGIN + userId);
-//        return ResponseResult.okResult();
-//    }
 //
 //    /**
 //     * 查询用户信息
