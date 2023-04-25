@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 import static com.blog.constants.CommonConstants.ARTICLE_COMMENT;
+import static com.blog.constants.CommonConstants.LINK_COMMENT;
 
 @RestController
 @RequestMapping("/comment")
@@ -18,10 +19,6 @@ public class CommentController {
 
     /**
      * 查询文章评论
-     * @param articleId
-     * @param pageNum
-     * @param pageSize
-     * @return
      */
     @GetMapping("/commentList")
     public ResponseResult getCommentList(Long articleId, Integer pageNum, Integer pageSize) {
@@ -30,8 +27,6 @@ public class CommentController {
 
     /**
      * 添加评论
-     * @param addCommentDto
-     * @return
      */
     @PostMapping
     public ResponseResult addComment(@RequestBody AddCommentDto addCommentDto) {
@@ -39,14 +34,13 @@ public class CommentController {
         Comment comment = BeanCopyPropertiesUtils.copyBean(addCommentDto, Comment.class);
         return commentService.addComment(comment);
     }
-//
-//    /**
-//     * 查询友链评论
-//     *
-//     * @return
-//     */
-//    @GetMapping("/linkCommentList")
-//    public ResponseResult linkCommentList(Integer pageNum, Integer pageSize) {
-//        return commentService.getCommentList(LINK_COMMENT, null, pageNum, pageSize);
-//    }
+
+    /**
+     * 查询友链评论
+     * @return
+     */
+    @GetMapping("/linkCommentList")
+    public ResponseResult linkCommentList(Integer pageNum, Integer pageSize) {
+        return commentService.getCommentList(LINK_COMMENT, null, pageNum, pageSize);
+    }
 }
