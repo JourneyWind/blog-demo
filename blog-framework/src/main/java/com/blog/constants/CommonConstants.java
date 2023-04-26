@@ -102,4 +102,6 @@ public class CommonConstants {
      */
     public static final String BLOG_USER_TOKEN_KEY = "blogLogin:";
 
+    public static final String VIEW_COUNT_KEY = "viewcount";
+
 }
