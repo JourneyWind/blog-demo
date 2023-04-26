@@ -1,6 +1,8 @@
 package com.blog.service.impl;
 
 
+import com.blog.enums.AppHttpCodeEnum;
+import com.blog.exception.SystemException;
 import com.blog.service.UploadService;
 import com.blog.utils.FilePathUtils;
 import com.blog.utils.ResponseResult;
@@ -41,10 +43,12 @@ public class UploadServiceImpl implements UploadService {
             imageUrl = ossUpload(filePathName, img.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
+            throw new SystemException(AppHttpCodeEnum.SYSTEM_ERROR);
         }
         return ResponseResult.okResult(imageUrl);
     }
 
+    //文件上传七牛云oss
     private String ossUpload(String key, InputStream inputStream) {
         //构造一个带指定 Region 对象的配置类
         Configuration cfg = new Configuration(Region.autoRegion());
@@ -75,56 +79,4 @@ public class UploadServiceImpl implements UploadService {
         }
         return null;
     }
-//
-//    /**
-//     * 文件上传阿里云OSS
-//     *
-//     * @param imgFile
-//     * @return
-//     */
-//    @Override
-//    public ResponseResult uploadImg(MultipartFile imgFile) {
-////        1.获取到原始文件名
-//        String originalFilename = imgFile.getOriginalFilename();
-//        String fileName = ImgUtils.generateFilePath(originalFilename);
-//        String imgUrl = ossUpload(imgFile, fileName);
-//        return ResponseResult.okResult(imgUrl);
-//    }
-//
-//
-//    private String ossUpload(MultipartFile multipartFile, String fileName) {
-//        // 创建OSSClient实例。
-//        OSS ossClient = new OSSClientBuilder()
-//                .build(OssUtils.END_POINT, OssUtils.ACCESS_KEY_ID, OssUtils.ACCESS_KEY_SECRET);
-//
-//
-//        // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt。
-//        String objectName = "sangengblog/" + fileName;
-//        try {
-//
-//            InputStream inputStream = multipartFile.getInputStream();
-//            // 创建PutObject请求。
-//            ossClient.putObject(OssUtils.BUCKET_NAME, objectName, inputStream);
-//        } catch (OSSException oe) {
-//            System.out.println("Caught an OSSException, which means your request made it to OSS, "
-//                    + "but was rejected with an error response for some reason.");
-//            System.out.println("Error Message:" + oe.getErrorMessage());
-//            System.out.println("Error Code:" + oe.getErrorCode());
-//            System.out.println("Request ID:" + oe.getRequestId());
-//            System.out.println("Host ID:" + oe.getHostId());
-//        } catch (ClientException ce) {
-//            System.out.println("Caught an ClientException, which means the client encountered "
-//                    + "a serious internal problem while trying to communicate with OSS, "
-//                    + "such as not being able to access the network.");
-//            System.out.println("Error Message:" + ce.getMessage());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (ossClient != null) {
-//                ossClient.shutdown();
-//            }
-//        }
-////        返回对象存储中的图片路径
-//        return "https://" + OssUtils.BUCKET_NAME + "." + OssUtils.END_POINT + "/" + objectName;
-//    }
 }

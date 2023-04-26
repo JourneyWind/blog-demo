@@ -1,30 +1,35 @@
 package com.blog.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.constants.CommonConstants;
 import com.blog.domain.entity.LoginUser;
 import com.blog.domain.entity.User;
 import com.blog.domain.vo.UserInfoVo;
 import com.blog.enums.AppHttpCodeEnum;
+import com.blog.exception.SystemException;
 import com.blog.mapper.UserMapper;
 import com.blog.service.UserService;
 import com.blog.utils.BeanCopyPropertiesUtils;
 import com.blog.utils.RedisCache;
 import com.blog.utils.ResponseResult;
 import com.blog.utils.SecurityUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 
 /**
  * @description 针对表【sys_user(用户表)】的数据库操作Service实现
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User>implements UserService {
-//    @Resource
-//    private BCryptPasswordEncoder passwordEncoder;
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+    @Resource
+    private BCryptPasswordEncoder passwordEncoder;
     @Resource
     private RedisCache redisCache;
 
@@ -47,7 +52,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>implements Use
         User newUser = getById(user.getId());
         //存入redis
         LoginUser loginUser = new LoginUser(newUser);
-        redisCache.setCacheObject(CommonConstants.BLOG_USER_TOKEN_KEY + user.getId(),loginUser);
+        redisCache.setCacheObject(CommonConstants.BLOG_USER_TOKEN_KEY + user.getId(), loginUser);
         return ResponseResult.okResult();
     }
 
@@ -56,88 +61,54 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>implements Use
      */
     @Override
     public ResponseResult userRegister(User user) {
-        return null;
+        //校验数据
+        if (!StringUtils.hasText(user.getNickName()) || !StringUtils.hasText(user.getEmail())
+                || !StringUtils.hasText(user.getPassword()) || !StringUtils.hasText(user.getUserName())) {
+            throw new SystemException(AppHttpCodeEnum.REGISTER_NOT_NULL);
+        }
+        if (!judgeUsername(user.getUserName())) {
+            throw new SystemException(AppHttpCodeEnum.USERNAME_EXIST);
+        }
+        if (!judgeEmail(user.getEmail())) {
+            throw new SystemException(AppHttpCodeEnum.EMAIL_EXIST);
+        }
+        //密码加密
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        save(user);
+        return ResponseResult.okResult();
     }
 
+    /**
+     * 判断用户名是否存在
+     *
+     * @param username
+     */
+    public boolean judgeUsername(String username) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(User::getUserName, username);
+        User user = getOne(queryWrapper);
+        if (Objects.isNull(user)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-
-
-//    @Override
-//    public ResponseResult userRegister(User user) {
-////        1.数据非空校验
-//        if (!StringUtils.hasText(user.getUserName())
-//                && !StringUtils.hasText(user.getPassword())
-//                && !StringUtils.hasText(user.getEmail())
-//                && !StringUtils.hasText(user.getNickName())
-//                && !StringUtils.hasText(user.getPhonenumber())){
-//            throw new SystemException(AppHttpCodeEnum.REGISTER_NOT_NULL);
-//        }
-////        2.数据是否存在校验
-//        if (!judgeUsername(user.getUserName())){
-//            throw new SystemException(AppHttpCodeEnum.USERNAME_EXIST);
-//        }
-//        if (!judgeNickname(user.getNickName())){
-//            throw new SystemException(AppHttpCodeEnum.NICKNAME_EXIST);
-//        }
-//        if (!judgeEmail(user.getEmail())){
-//            throw new SystemException(AppHttpCodeEnum.EMAIL_EXIST);
-//        }
-////        3.密码加密
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        save(user);
-////        4.添加用户
-//        return ResponseResult.okResult();
-//    }
-//
-//
-//    /**
-//     * 判断用户名是否存在
-//     * @param username
-//     * @return
-//     */
-//    public boolean judgeUsername(String username){
-//        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper();
-//        queryWrapper.eq(User::getUserName, username);
-//        User user = getOne(queryWrapper);
-//        if (Objects.isNull(user)){
-//            return true;
-//        }else{
-//            return false;
-//        }
-//    }
-//
-//    /**
-//     * 判断邮箱是否存在
-//     * @param email
-//     * @return
-//     */
-//    public boolean judgeEmail(String email){
-//        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper();
-//        queryWrapper.eq(User::getEmail, email);
-//        User user = getOne(queryWrapper);
-//        if (Objects.isNull(user)){
-//            return true;
-//        }else{
-//            return false;
-//        }
-//    }
-//
-//    /**
-//     * 判断昵称是否存在
-//     * @param nickname
-//     * @return
-//     */
-//    public boolean judgeNickname(String nickname){
-//        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper();
-//        queryWrapper.eq(User::getNickName, nickname);
-//        User user = getOne(queryWrapper);
-//        if (Objects.isNull(user)){
-//            return true;
-//        }else{
-//            return false;
-//        }
-//    }
-//
+    /**
+     * 判断邮箱是否存在
+     *
+     * @param email
+     */
+    public boolean judgeEmail(String email) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(User::getEmail, email);
+        User user = getOne(queryWrapper);
+        if (Objects.isNull(user)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }
 
