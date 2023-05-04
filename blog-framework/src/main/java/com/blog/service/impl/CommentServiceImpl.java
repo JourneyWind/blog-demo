@@ -1,6 +1,7 @@
 package com.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.domain.entity.Comment;
 import com.blog.domain.vo.CommentVo;
@@ -32,10 +33,12 @@ import static com.blog.constants.CommonConstants.ROOT_ID;
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
     @Resource
     private UserService userService;
+    @Resource
+    private CommentMapper commentMapper;
 
     @Override
     public ResponseResult getCommentList(String commentType, Long articleId, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        Page<Comment> page = Page.of(pageNum, pageSize);
         //查询对应文章根评论
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         //判断参数中是否含有articleId，含有表示是文章评论，没有是友链评论，有articleId参数就添加条件
@@ -43,7 +46,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .eq(Comment::getRootId, ROOT_ID);
         //评论类型
         queryWrapper.eq(Comment::getType,commentType);
-        List<Comment> list = list(queryWrapper);
+        Page<Comment> commentPage = commentMapper.selectPage(page, queryWrapper);
+        List<Comment> list = commentPage.getRecords();
         //将Comment对象封装为CommentVo对象并查询用户昵称赋值给username
         List<CommentVo> commentVos = toCommentListVo(list);
         //查询所有根评论对应子评论集合，并赋值
@@ -51,8 +55,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             List<CommentVo> children = getChildren(commentVo.getId());
             commentVo.setChildren(children);
         }
-        PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentVos);
-        PageVo pageVo = new PageVo(commentVoPageInfo.getList(), commentVoPageInfo.getTotal());
+        PageVo pageVo = new PageVo(commentVos, page.getTotal());
         return ResponseResult.okResult(pageVo);
     }
 

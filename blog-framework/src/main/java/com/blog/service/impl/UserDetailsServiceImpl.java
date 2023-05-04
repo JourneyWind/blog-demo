@@ -35,7 +35,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //            List<String> list = menuMapper.selectPermsByUserId(user.getId());
 //            return new LoginUser(user,list);
 //        }
-//
 //        return new LoginUser(user,null);
         return new LoginUser(user);
     }

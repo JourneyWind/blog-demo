@@ -1,6 +1,7 @@
 package com.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.constants.CommonConstants;
 import com.blog.domain.entity.Category;
@@ -33,6 +34,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private CategoryMapper categoryMapper;
     @Resource
     private RedisCache redisCache;
+    @Resource
+    private ArticleMapper articleMapper;
 
     @Override
     public ResponseResult hotArticleList() {
@@ -58,7 +61,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public ResponseResult articleList(Integer pageNum, Integer pageSize, Long categoryId) {
         //1.开启分页查询
-        PageHelper.startPage(pageNum, pageSize);
+        Page<Article> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Article> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         //首页 查询所有文章
         //正式发布的文章
@@ -70,21 +73,21 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (categoryId != null && categoryId > 0) {
             lambdaQueryWrapper.eq(Article::getCategoryId, categoryId);
         }
-        List<Article> articleList = list(lambdaQueryWrapper);
+        Page<Article> articlePage = articleMapper.selectPage(page, lambdaQueryWrapper);
+        List<Article> articleList = articlePage.getRecords();
+
         //查询获取categoryName
         articleList = articleList.stream()
                 .map(article -> {
                     Category category = categoryMapper.selectById(article.getCategoryId());
                     article.setCategoryName(category.getName());
-                    article.setViewCount(Long.valueOf(redisCache.getCacheMapValue(VIEW_COUNT_KEY,article.getId().toString()).toString()));
+                    article.setViewCount(Long.valueOf(redisCache.getCacheMapValue(VIEW_COUNT_KEY, article.getId().toString()).toString()));
                     return article;
                 }).collect(Collectors.toList());
 
         //封装成vo
         List<ArticleListVo> articleListVos = BeanCopyPropertiesUtils.copyBeanList(articleList, ArticleListVo.class);
-        PageInfo<ArticleListVo> pageInfo = new PageInfo<>(articleListVos);
-        PageVo pageVo = new PageVo(pageInfo.getList(), pageInfo.getTotal());
-
+        PageVo pageVo = new PageVo(articleListVos, articlePage.getTotal());
         return ResponseResult.okResult(pageVo);
     }
 
@@ -94,7 +97,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Article article = getById(id);
         //封装成vo
         ArticleDetailVo articleDetailVo = BeanCopyPropertiesUtils.copyBean(article, ArticleDetailVo.class);
-        articleDetailVo.setViewCount(Long.valueOf(redisCache.getCacheMapValue(VIEW_COUNT_KEY,article.getId().toString()).toString()));
+        articleDetailVo.setViewCount(Long.valueOf(redisCache.getCacheMapValue(VIEW_COUNT_KEY, article.getId().toString()).toString()));
         //根据分类id查询分类名
         Category category = categoryMapper.selectById(articleDetailVo.getCategoryId());
 

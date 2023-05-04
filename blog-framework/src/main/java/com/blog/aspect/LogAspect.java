@@ -24,7 +24,6 @@ public class LogAspect {
 
     @Pointcut("@annotation(com.blog.annocation.SystemLog)")
     public void pt(){
-
     }
 
     @Around("pt()")
