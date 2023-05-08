@@ -100,8 +100,8 @@ public class CommonConstants {
     /**
      * 登陆的Token  key
      */
-    public static final String BLOG_USER_TOKEN_KEY = "blogLogin:";
-    public static final String ADMIN_USER_TOKEN_KEY = "Login:";
+    public static final String BLOG_USER_TOKEN_KEY = "Login:Blog:";
+    public static final String ADMIN_USER_TOKEN_KEY = "Login:Admin:";
 
 
     public static final String VIEW_COUNT_KEY = "viewcount";

@@ -9,14 +9,4 @@ import java.util.List;
  * @description 针对表【sys_user_role(用户和角色关联表)】的数据库操作Service
  */
 public interface UserRoleService extends IService<UserRole> {
-
-    /**
-     * 得到用户角色id
-     *
-     * @param id id
-     * @return {@link List}<{@link Long}>
-     */
-    public List<Long> getUserRoleById(Long id);
-
-
 }

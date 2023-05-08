@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminUserInfoVo {
-
     private List<String> permissions;
 
     private List<String> roles;

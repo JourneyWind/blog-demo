@@ -13,9 +13,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 /**
  * 角色信息表(Role)表实体类
- *
- * @author makejava
- * @since 2022-08-09 22:36:46
  */
 @SuppressWarnings("serial")
 @Data

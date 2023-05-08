@@ -9,6 +9,7 @@ import java.util.List;
 * @description 针对表【sys_menu(菜单权限表)】的数据库操作Service
 */
 public interface MenuService extends IService<Menu> {
+    List<String> selectPermsByUserId(Long id);
 
 //
 //    /**

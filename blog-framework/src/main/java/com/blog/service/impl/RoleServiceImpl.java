@@ -1,30 +1,28 @@
-//package com.blog.service.impl;
-//
-//import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-//import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-//import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-//import org.springframework.context.annotation.Lazy;
-//import org.springframework.stereotype.Service;
-//import org.springframework.util.StringUtils;
-//import javax.annotation.Resource;
-//import java.util.List;
-//import java.util.Objects;
-//
-///**
-// * @description 针对表【sys_role(角色信息表)】的数据库操作Service实现
-// */
-//@Service
-//public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>
-//        implements RoleService {
-//
-//    @Resource
-//    private RoleMapper roleMapper;
-//
-//    @Lazy
-//    @Resource
-//    private RoleService roleService;
-//
+package com.blog.service.impl;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.blog.domain.entity.Role;
+import com.blog.mapper.RoleMapper;
+import com.blog.service.RoleService;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * @description 针对表【sys_role(角色信息表)】的数据库操作Service实现
+ */
+@Service
+public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
+    @Override
+    public List<String> selectRoleKeyByUserId(Long id) {
+        //判断是否是管理员 是则返回admin
+        if (id == 1L){
+            return Arrays.asList("admin");
+        }
+        return getBaseMapper().selectRoleKeyByUserId(id);
+    }
+
 //    @Resource
 //    private RoleMenuService roleMenuService;
 //
@@ -233,9 +231,6 @@
 //        }
 //    }
 //
-//
-//}
-//
-//
-//
-//
+
+}
+

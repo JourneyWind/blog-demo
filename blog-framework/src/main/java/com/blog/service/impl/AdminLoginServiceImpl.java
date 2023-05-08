@@ -1,81 +1,68 @@
-//package com.blog.service.impl;
-//
-//import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-//import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-//import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-//import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.stereotype.Service;
-//import org.springframework.util.StringUtils;
-//import javax.annotation.Resource;
-//import java.util.*;
-//import java.util.stream.Collectors;
-//
-//@Service
-//public class AdminUserServiceImpl implements AdminUserService {
-//
-//    @Resource
-//    private AuthenticationManager authenticationManager;
-//
-//    @Resource
-//    private RedisCache redisCache;
-//
-//    @Resource
-//    private BCryptPasswordEncoder passwordEncoder;
-//
-//    @Resource
-//    private MenuMapper menuMapper;
-//
-//    @Resource
-//    private UserMapper userMapper;
-//
-//    @Resource
-//    private RoleMapper roleMapper;
-//
-//    @Resource
-//    private UserService userService;
-//
-//    @Resource
-//    private UserRoleService userRoleService;
-//
-//    @Resource
-//    private RoleService roleService;
-//
-//
-//
-//    /**
-//     * 用户登录
-//     *
-//     * @return
-//     */
-//    @Override
-//    public ResponseResult userLogin(User user) {
-////        1.根据username和password封装Authentication对象
-//        UsernamePasswordAuthenticationToken authenticationToken =
-//                new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword());
-////        2.AuthenticationManager调用authenticate方法，再调用UserDetailsService的loadUserByUsername方法
-//        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-////        3.判断认证是否通过
-//        if (Objects.isNull(authenticate)) {
-//            throw new RuntimeException("用户名或密码错误！");
-//        }
-////        4.获取到用户id
-//        LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
-//        String userId = loginUser.getUser().getId().toString();
-////          4.1生成JWT
-//        String jwt = JwtUtils.createJWT(userId);
-//
-////        5.将用户信息存入缓存
-//        redisCache.setCacheObject(ADMIN_USER_LOGIN + userId, loginUser);
-//        Map<String, String> map = new HashMap<>();
-//        map.put("token", jwt);
-////        7.将token和用户信息封装返回
-//        return ResponseResult.okResult(map);
-//    }
-//
-//
+package com.blog.service.impl;
+
+import com.blog.domain.entity.LoginUser;
+import com.blog.domain.entity.User;
+import com.blog.domain.vo.AdminUserInfoVo;
+import com.blog.domain.vo.UserInfoVo;
+import com.blog.service.AdminLoginService;
+import com.blog.service.MenuService;
+import com.blog.service.RoleService;
+import com.blog.utils.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+
+import static com.blog.constants.CommonConstants.ADMIN_USER_TOKEN_KEY;
+
+@Service
+public class AdminLoginServiceImpl implements AdminLoginService {
+    @Resource
+    private AuthenticationManager authenticationManager;
+    @Resource
+    private RedisCache redisCache;
+    @Resource
+    private MenuService menuService;
+    @Resource
+    private RoleService roleService;
+
+    public ResponseResult login(User user) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword());
+        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+        //获取userid生成token
+        LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
+        String userId = loginUser.getUser().getId().toString();
+        String jwt = JwtUtils.createJWT(userId);
+        //把用户信息存入redis
+        redisCache.setCacheObject(ADMIN_USER_TOKEN_KEY + userId, loginUser);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("token",jwt);
+        return ResponseResult.okResult(map);
+    }
+
+    public ResponseResult<AdminUserInfoVo> getInfo(){
+        //获取当前登录用户信息
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        //根据用户id查询权限信息
+        List<String> perms = menuService.selectPermsByUserId(loginUser.getUser().getId());
+        //根据用户id查询角色信息
+        List<String> roleKeyList = roleService.selectRoleKeyByUserId(loginUser.getUser().getId());
+
+        AdminUserInfoVo adminUserInfoVo = new AdminUserInfoVo(perms, roleKeyList,
+                BeanCopyPropertiesUtils.copyBean(loginUser.getUser(), UserInfoVo.class));
+        return ResponseResult.okResult(adminUserInfoVo);
+    }
+
+
+
+
+
+
+
 //    /**
 //     * 获取用户信息
 //     *
@@ -347,4 +334,4 @@
 //    }
 //
 //
-//}
+}

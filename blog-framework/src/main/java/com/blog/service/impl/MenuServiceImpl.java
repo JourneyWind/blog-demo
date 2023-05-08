@@ -1,21 +1,40 @@
-//package com.blog.service.impl;
-//
-//import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-//import org.springframework.context.annotation.Lazy;
-//import org.springframework.stereotype.Service;
-//import org.springframework.util.StringUtils;
-//import javax.annotation.Resource;
-//import java.util.List;
-//import java.util.Objects;
-//import java.util.stream.Collectors;
-//
-///**
-// * @description 针对表【sys_menu(菜单权限表)】的数据库操作Service实现
-// */
-//@Service
-//public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu>implements MenuService {
-//
+package com.blog.service.impl;
+
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.blog.constants.CommonConstants;
+import com.blog.domain.entity.Menu;
+import com.blog.mapper.MenuMapper;
+import com.blog.service.MenuService;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @description 针对表【sys_menu(菜单权限表)】的数据库操作Service实现
+ */
+@Service
+public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
+
+
+    @Override
+    public List<String> selectPermsByUserId(Long id) {
+        //id为1默认管理员,返回所有权限
+        if (id == 1l){
+            LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Menu::getStatus, CommonConstants.MENU_STATUS_NORMAL);
+            wrapper.in(Menu::getMenuType,CommonConstants.MENU,CommonConstants.BUTTON);
+            List<Menu> menus = list(wrapper);
+            List<String> perms = menus.stream().map(Menu::getPerms).collect(Collectors.toList());
+            return perms;
+        }
+        //userId-->roleId-->menuId-->perms
+        List<String> perms = getBaseMapper().selectPermsByUserId(id);
+        return perms;
+    }
+
+
 //    @Resource
 //    private MenuMapper menuMapper;
 //
@@ -232,9 +251,9 @@
 //        return getBaseMapper().selectMenuListByRoleId(roleId);
 //    }
 //
-//
-//}
-//
-//
-//
-//
+
+}
+
+
+
+

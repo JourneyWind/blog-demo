@@ -13,11 +13,8 @@ import com.blog.service.CommentService;
 import com.blog.service.UserService;
 import com.blog.utils.BeanCopyPropertiesUtils;
 import com.blog.utils.ResponseResult;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -104,7 +101,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     /**
      * 根据根评论rootId查询对应的子评论的集合
-     *
      * @param id
      * @return
      */

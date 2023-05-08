@@ -51,7 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //查询新的用户信息
         User newUser = getById(user.getId());
         //存入redis
-        LoginUser loginUser = new LoginUser(newUser);
+        LoginUser loginUser = new LoginUser(newUser,null);
         redisCache.setCacheObject(CommonConstants.BLOG_USER_TOKEN_KEY + user.getId(), loginUser);
         return ResponseResult.okResult();
     }

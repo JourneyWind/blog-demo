@@ -1,21 +1,25 @@
 package com.blog.controller;
 
 import com.blog.domain.entity.User;
-import com.blog.service.LoginService;
+import com.blog.domain.vo.AdminUserInfoVo;
+import com.blog.service.AdminLoginService;
 import com.blog.utils.ResponseResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/user")
 public class AdminUserController {
     @Resource
-    private LoginService loginService;
-    @PostMapping("/login")
+    private AdminLoginService loginService;
+
+    @PostMapping("/user/login")
     public ResponseResult login(@RequestBody User user){
         return loginService.login(user);
+    }
+
+    @GetMapping("/getInfo")
+    public ResponseResult<AdminUserInfoVo> getInfo(){
+        return loginService.getInfo();
     }
 }
