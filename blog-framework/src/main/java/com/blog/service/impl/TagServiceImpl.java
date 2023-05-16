@@ -1,26 +1,19 @@
-//package com.blog.service.impl;
-//
-//import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-//import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-//import org.springframework.stereotype.Service;
-//import org.springframework.util.StringUtils;
-//import javax.annotation.Resource;
-//import java.util.List;
-//import java.util.Objects;
+package com.blog.service.impl;
 
-///**
-// * @description 针对表【sg_tag(标签)】的数据库操作Service实现
-// */
-//@Service
-//public class TagServiceImpl extends ServiceImpl<TagMapper, Tag>
-//        implements TagService {
-//
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.blog.domain.entity.Tag;
+import com.blog.mapper.TagMapper;
+import com.blog.service.TagService;
+import org.springframework.stereotype.Service;
+
+/**
+ * @description 针对表【sg_tag(标签)】的数据库操作Service实现
+ */
+@Service
+public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
+
 //    @Resource
 //    private TagMapper tagMapper;
-//
-//
-//
 //    /**
 //     * 查询标签列表
 //     *
@@ -131,8 +124,4 @@
 //        List<TagVo> tagVos = BeanCopyPropertiesUtils.copyBeanList(tags, TagVo.class);
 //        return ResponseResult.okResult(tagVos);
 //    }
-//}
-//
-//
-//
-//
+}
