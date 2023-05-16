@@ -20,7 +20,7 @@ spring:
 
 # 配置redis
   redis:
-    host: localhost
+    host: 47.100.15.149
     port: 6379
     password: 123456
     lettuce:
@@ -44,7 +44,7 @@ mybatis-plus:
 
 
 oss:
-  accessKey: a
-  secretKey: a
-  bucket: a
-  cdnUrlPre: a
+  accessKey: 3-aE8yi3F8ciNSEUXQJ1KZwPWtW3vgah2H5AjktU
+  secretKey: ftp0NJ98uELM-Pot46gXWvZKs9lqSz-AWOs_tMku
+  bucket: journeywind-blog
+  cdnUrlPre: http://rtogzukek.hd-bkt.clouddn.com/

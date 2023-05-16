@@ -28,4 +28,9 @@ public class AdminUserController {
     public ResponseResult<RoutersVo> getRouters(){
         return loginService.getRouters();
     }
+
+    @PostMapping("/user/logout")
+    public ResponseResult logout(){
+        return loginService.logout();
+    }
 }

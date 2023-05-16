@@ -66,4 +66,10 @@ public class AdminLoginServiceImpl implements AdminLoginService {
         return ResponseResult.okResult(new RoutersVo(menus));
     }
 
+    @Override
+    public ResponseResult logout() {
+        redisCache.deleteObject(ADMIN_USER_TOKEN_KEY + SecurityUtils.getUserId());
+        return ResponseResult.okResult();
+    }
+
 }

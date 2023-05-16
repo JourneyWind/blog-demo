@@ -11,4 +11,6 @@ public interface AdminLoginService {
     ResponseResult<AdminUserInfoVo> getInfo();
 
     ResponseResult<RoutersVo> getRouters();
+
+    ResponseResult logout();
 }
