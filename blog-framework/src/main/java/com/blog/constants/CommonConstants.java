@@ -63,7 +63,10 @@ public class CommonConstants {
      * 按钮
      */
     public static final String BUTTON = "F";
-
+    /**
+     * 目录
+     */
+    public static final String DIRECTORY = "M";
 
     /**
      * 权限状态正常

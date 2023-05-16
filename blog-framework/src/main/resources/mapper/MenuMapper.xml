@@ -9,10 +9,26 @@
                      WHERE role_id IN (
                          select `role_id`
                          FROM `sys_user_role`
-                         WHERE user_id = 7
+                         WHERE user_id = #{id}
                      )
         ) AND `menu_type` IN ('C','F')
           AND `status` = 0
           AND `del_flag` = 0
+    </select>
+    <select id="selectRoutersByUserId" resultType="com.blog.domain.entity.Menu">
+        SELECT DISTINCT *
+        FROM `sys_menu` m
+        WHERE id IN (SELECT `menu_id`
+                     FROM `sys_role_menu`
+                     WHERE role_id IN (
+                         select `role_id`
+                         FROM `sys_user_role`
+                         WHERE user_id = #{userId}
+                     )
+        ) AND `menu_type` IN ('C','M')
+          AND `status` = 0
+          AND `del_flag` = 0
+            ORDER BY
+                m.`id`,m.`parent_id`,m.`order_num`
     </select>
 </mapper>

@@ -11,6 +11,8 @@ import java.util.List;
 public interface MenuService extends IService<Menu> {
     List<String> selectPermsByUserId(Long id);
 
+    List<Menu> selectRouterMenuTreeBuUserId(Long userId);
+
 //
 //    /**
 //     * 根据条件查询menu信息

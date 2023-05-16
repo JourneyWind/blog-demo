@@ -17,7 +17,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public List<String> selectRoleKeyByUserId(Long id) {
         //判断是否是管理员 是则返回admin
-        if (id == 1L){
+        if (id != null && id == 1L) {
             return Arrays.asList("admin");
         }
         return getBaseMapper().selectRoleKeyByUserId(id);
