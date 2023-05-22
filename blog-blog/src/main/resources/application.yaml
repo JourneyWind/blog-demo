@@ -14,7 +14,7 @@ spring:
 #    date-format: yyyy-MM-dd HH:mm:ss
   redis:
     port: 6379
-    host: 47.100.15.149
+    host:
     password: 123456
     lettuce:
       pool:
@@ -40,7 +40,7 @@ mybatis-plus:
 
 
 oss:
-  accessKey: 3-aE8yi3F8ciNSEUXQJ1KZwPWtW3vgah2H5AjktU
-  secretKey: ftp0NJ98uELM-Pot46gXWvZKs9lqSz-AWOs_tMku
-  bucket: journeywind-blog
-  cdnUrlPre: http://rtogzukek.hd-bkt.clouddn.com/
+  accessKey:
+  secretKey:
+  bucket:
+  cdnUrlPre:
