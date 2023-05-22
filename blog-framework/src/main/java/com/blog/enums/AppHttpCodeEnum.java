@@ -20,7 +20,9 @@ public enum AppHttpCodeEnum {
     NICKNAME_EXIST(512, "昵称已存在"),
     REGISTER_NOT_NULL(513,"注册信息不能为空"),
     LOGIN_ERROR(505,"用户名或密码错误"),
-    UPDATE_USERINFO_ERR(514,"个人信息更新失败");
+    UPDATE_USERINFO_ERR(514,"个人信息更新失败"),
+    TAG_IS_EXIST(515,"标签已存在");
+
     int code;
     String msg;
 

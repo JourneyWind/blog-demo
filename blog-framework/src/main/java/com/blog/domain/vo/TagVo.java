@@ -12,9 +12,6 @@ import java.util.Date;
 
 /**
  * 标签(Tag)表实体类
- *
- * @author makejava
- * @since 2022-07-19 22:33:36
  */
 @SuppressWarnings("serial")
 @Data
@@ -24,7 +21,5 @@ public class TagVo {
     private Long id;
     //标签名
     private String name;
-
-
-
+    private String remark;
 }
