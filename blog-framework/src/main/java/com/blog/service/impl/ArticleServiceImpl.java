@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.constants.CommonConstants;
+import com.blog.domain.dto.AddArticleDto;
+import com.blog.domain.entity.ArticleTag;
 import com.blog.domain.entity.Category;
 import com.blog.domain.vo.ArticleDetailVo;
 import com.blog.domain.vo.ArticleListVo;
 import com.blog.domain.vo.HotArticleVo;
 import com.blog.domain.vo.PageVo;
 import com.blog.mapper.CategoryMapper;
+import com.blog.service.ArticleTagService;
 import com.blog.utils.BeanCopyPropertiesUtils;
 import com.blog.utils.RedisCache;
 import com.blog.utils.ResponseResult;
@@ -17,6 +20,7 @@ import com.blog.domain.entity.Article;
 import com.blog.mapper.ArticleMapper;
 import com.blog.service.ArticleService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.annotation.Resource;
@@ -34,6 +38,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private RedisCache redisCache;
     @Resource
     private ArticleMapper articleMapper;
+    @Resource
+    private ArticleTagService articleTagService;
 
     @Override
     public ResponseResult hotArticleList() {
@@ -106,30 +112,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    @Transactional
     public ResponseResult updateViewCount(Long id) {
         //从redis中查询浏览量
         redisCache.incrementCacheMapValue(VIEW_COUNT_KEY, id.toString(), 1);
         return ResponseResult.okResult();
     }
 
+    @Override
+    public ResponseResult addBlog(AddArticleDto addArticleDto) {
+        Article article = BeanCopyPropertiesUtils.copyBean(addArticleDto, Article.class);
+        //添加博客
+        save(article);
+        List<ArticleTag> articleTags = addArticleDto.getTags().stream()
+                .map(tagId -> new ArticleTag(article.getId(), tagId))
+                .collect(Collectors.toList());
+        //添加博客-标签关联
+        articleTagService.saveBatch(articleTags);
+        return ResponseResult.okResult();
+    }
 
-//    @Override
-//    public ResponseResult add(AddArticleDto article) {
-//        return null;
-//    }
-//
-//    @Override
-//    public PageVo selectArticlePage(Article article, Integer pageNum, Integer pageSize) {
-//        return null;
-//    }
-//
-//    @Override
-//    public ArticleVo getInfo(Long id) {
-//        return null;
-//    }
-//
-//    @Override
-//    public void edit(ArticleDto article) {
-//
-//    }
+
 }

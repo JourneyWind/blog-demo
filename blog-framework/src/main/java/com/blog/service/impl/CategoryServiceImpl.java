@@ -2,6 +2,7 @@ package com.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.blog.constants.CommonConstants;
 import com.blog.domain.entity.Article;
 import com.blog.domain.entity.Category;
 import com.blog.domain.vo.CategoryVo;
@@ -28,7 +29,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Resource
     private ArticleService articleService;
-//
 //    @Resource
 //    private CategoryMapper categoryMapper;
 
@@ -55,6 +55,15 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
                 .collect(Collectors.toList());
         //5.封装VO对象
         List<CategoryVo> categoryVos = BeanCopyPropertiesUtils.copyBeanList(categories, CategoryVo.class);
+        return ResponseResult.okResult(categoryVos);
+    }
+
+    @Override
+    public ResponseResult listAllCategory() {
+        LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper();
+        wrapper.eq(Category::getStatus, CATEGORY_STATUS_NORMAL);
+        List<Category> list = list(wrapper);
+        List<CategoryVo> categoryVos = BeanCopyPropertiesUtils.copyBeanList(list, CategoryVo.class);
         return ResponseResult.okResult(categoryVos);
     }
 

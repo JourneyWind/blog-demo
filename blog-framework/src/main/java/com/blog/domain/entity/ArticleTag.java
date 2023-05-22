@@ -9,9 +9,6 @@ import java.io.Serializable;
 
 /**
  * 文章标签关联表(ArticleTag)实体类
- *
- * @author makejava
- * @since 2022-01-15 20:50:54
  */
 @TableName(value="sg_article_tag")
 @Data

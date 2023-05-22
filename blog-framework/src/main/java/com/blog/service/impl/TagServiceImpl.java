@@ -66,6 +66,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
     /**
      * 点击修改按钮查询要修改的标签信息
+     *
      * @param id
      * @return
      */
@@ -82,12 +83,21 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
     @Override
     public ResponseResult updateTag(TagVo tagVo) {
-        if (!StringUtils.hasText(tagVo.getName()) && !StringUtils.hasText(tagVo.getRemark())){
+        if (!StringUtils.hasText(tagVo.getName()) && !StringUtils.hasText(tagVo.getRemark())) {
             return ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);
         }
         Tag tag = BeanCopyPropertiesUtils.copyBean(tagVo, Tag.class);
         updateById(tag);
         return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult listAllTag() {
+        LambdaQueryWrapper<Tag> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(Tag::getId, Tag::getName);
+        List<Tag> list = list(wrapper);
+        List<TagVo> tagVos = BeanCopyPropertiesUtils.copyBeanList(list, TagVo.class);
+        return ResponseResult.okResult(tagVos);
     }
 
 }

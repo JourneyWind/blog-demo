@@ -9,6 +9,7 @@ import com.blog.utils.ResponseResult;
 import com.blog.utils.WebUtils;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -19,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Objects;
 
 import static com.blog.constants.CommonConstants.BLOG_USER_TOKEN_KEY;
@@ -69,10 +71,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        //TODO 4.获取用户权限
+        //4.获取用户权限
+        Collection<? extends GrantedAuthority> authorities = loginUser.getAuthorities();
         //5.封装Authentication对象，将用户信息存入SecurityContextHolder中
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
-                = new UsernamePasswordAuthenticationToken(loginUser, null, null);
+                = new UsernamePasswordAuthenticationToken(loginUser, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         filterChain.doFilter(request, response);
     }
