@@ -5,12 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.constants.CommonConstants;
 import com.blog.domain.dto.AddArticleDto;
+import com.blog.domain.dto.ArticleDto;
 import com.blog.domain.entity.ArticleTag;
 import com.blog.domain.entity.Category;
-import com.blog.domain.vo.ArticleDetailVo;
-import com.blog.domain.vo.ArticleListVo;
-import com.blog.domain.vo.HotArticleVo;
-import com.blog.domain.vo.PageVo;
+import com.blog.domain.vo.*;
+import com.blog.enums.AppHttpCodeEnum;
 import com.blog.mapper.CategoryMapper;
 import com.blog.service.ArticleTagService;
 import com.blog.utils.BeanCopyPropertiesUtils;
@@ -21,6 +20,8 @@ import com.blog.mapper.ArticleMapper;
 import com.blog.service.ArticleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 
 import javax.annotation.Resource;
@@ -129,6 +130,55 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 .collect(Collectors.toList());
         //添加博客-标签关联
         articleTagService.saveBatch(articleTags);
+        return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult listByCondition(Integer pageNum, Integer pageSize, String title, String summary) {
+        LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.hasText(title)){
+            wrapper.like(Article::getTitle, title);
+        }
+        if (StringUtils.hasText(summary)){
+            wrapper.like(Article::getSummary, summary);
+        }
+        Page<Article> page = new Page<>(pageNum, pageSize);
+        Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
+        List<ArticleDto> articleDto = BeanCopyPropertiesUtils.copyBeanList(articlePage.getRecords(), ArticleDto.class);
+        PageVo pageVo = new PageVo(articleDto, page.getTotal());
+        return ResponseResult.okResult(pageVo);
+    }
+
+    @Override
+    @Transactional
+    public ResponseResult selectDetails(Integer id) {
+        Article article = getById(id);
+        if (ObjectUtils.isEmpty(article)){
+            return ResponseResult.errorResult(AppHttpCodeEnum.ARTICLE_IS_NOT_EXIST);
+        }
+        ArticleVo articleVo = BeanCopyPropertiesUtils.copyBean(article, ArticleVo.class);
+        LambdaQueryWrapper<ArticleTag> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ArticleTag::getArticleId,id);
+        List<ArticleTag> articleTags = articleTagService.list(wrapper);
+        articleVo.setTags(articleTags.stream().map(tag -> tag.getTagId()).collect(Collectors.toList()));
+        return ResponseResult.okResult(articleVo);
+    }
+
+    @Override
+    public ResponseResult editArticle(AddArticleDto addArticleDto) {
+        updateById(BeanCopyPropertiesUtils.copyBean(addArticleDto,Article.class));
+        List<Long> tags = addArticleDto.getTags();
+        LambdaQueryWrapper<ArticleTag> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ArticleTag::getArticleId,addArticleDto.getId());
+        articleTagService.remove(wrapper);
+        articleTagService.saveBatch(
+                tags.stream().map(tag -> new ArticleTag(addArticleDto.getId(),tag)).collect(Collectors.toList()));
+        return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult deleteArticle(Integer id) {
+        removeById(id);
         return ResponseResult.okResult();
     }
 

@@ -1,20 +1,26 @@
 package com.blog.service.impl;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.blog.constants.CommonConstants;
 import com.blog.domain.entity.Article;
 import com.blog.domain.entity.Category;
 import com.blog.domain.vo.CategoryVo;
+import com.blog.domain.vo.ExcelCategoryVo;
+import com.blog.enums.AppHttpCodeEnum;
 import com.blog.mapper.CategoryMapper;
 import com.blog.service.ArticleService;
 import com.blog.service.CategoryService;
 import com.blog.utils.BeanCopyPropertiesUtils;
+import com.blog.utils.ExcelUtils;
 import com.blog.utils.ResponseResult;
+import com.blog.utils.WebUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +35,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Resource
     private ArticleService articleService;
-//    @Resource
-//    private CategoryMapper categoryMapper;
+    @Resource
+    private CategoryService categoryService;
 
 
     /**
@@ -65,6 +71,23 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         List<Category> list = list(wrapper);
         List<CategoryVo> categoryVos = BeanCopyPropertiesUtils.copyBeanList(list, CategoryVo.class);
         return ResponseResult.okResult(categoryVos);
+    }
+
+    @Override
+    public void excelExport(HttpServletResponse response) {
+        try {
+            //设置下载文件的请求头
+            ExcelUtils.setDownLoadHeader("分类", response);
+            //获取需要导出的分类数据
+            List<Category> list = categoryService.list();
+            List<ExcelCategoryVo> excelCategoryVos = BeanCopyPropertiesUtils.copyBeanList(list, ExcelCategoryVo.class);
+            //将文件写入excel
+            EasyExcel.write(response.getOutputStream(), ExcelCategoryVo.class).sheet("分类导出")
+                    .doWrite(excelCategoryVos);
+        } catch (Exception e) {
+            ResponseResult responseResult = ResponseResult.errorResult(AppHttpCodeEnum.SYSTEM_ERROR);
+            WebUtils.renderString(response, JSON.toJSONString(responseResult));
+        }
     }
 
 //

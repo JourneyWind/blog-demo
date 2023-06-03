@@ -17,9 +17,11 @@ public interface ArticleService extends IService<Article> {
 
     ResponseResult addBlog(AddArticleDto addArticleDto);
 
-//    PageVo selectArticlePage(Article article, Integer pageNum, Integer pageSize);
-//
-//    ArticleVo getInfo(Long id);
-//
-//    void edit(ArticleDto article);
+    ResponseResult listByCondition(Integer pageNum, Integer pageSize, String title, String summary);
+
+    ResponseResult selectDetails(Integer id);
+
+    ResponseResult editArticle(AddArticleDto addArticleDto);
+
+    ResponseResult deleteArticle(Integer id);
 }
