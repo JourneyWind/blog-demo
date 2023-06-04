@@ -2,6 +2,7 @@ package com.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.blog.domain.entity.Menu;
+import com.blog.utils.ResponseResult;
 
 import java.util.List;
 
@@ -13,28 +14,13 @@ public interface MenuService extends IService<Menu> {
 
     List<Menu> selectRouterMenuTreeBuUserId(Long userId);
 
-//
-//    /**
-//     * 根据条件查询menu信息
-//     * @return {@link ResponseResult}
-//     */
-//    ResponseResult selectRouterMenu();
-//
-//    List<Menu> selectMenuList(Menu menu);
-//
-//    ResponseResult getMenuList(String status, String menuName);
-//
-//    ResponseResult addMenu(MenuDto menuDto);
-//
-//    ResponseResult getMenuById(Long id);
-//
-//    ResponseResult updateMenu(MenuDto menuDto);
-//
-//    ResponseResult deleteMenu(Long menuId);
-//
-//    ResponseResult getMenuTree();
-//
-//    ResponseResult roleMenuTreeselect(Long id);
+    ResponseResult getMenuList(String status, String menuName);
 
+    ResponseResult addMenu(Menu menu);
 
+    ResponseResult getMenuById(Long id);
+
+    ResponseResult updateMenu(Menu menu);
+
+    ResponseResult deleteMenu(Long id);
 }

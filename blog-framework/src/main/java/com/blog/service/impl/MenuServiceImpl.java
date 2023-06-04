@@ -5,11 +5,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.constants.CommonConstants;
 import com.blog.domain.entity.Menu;
+import com.blog.domain.vo.MenuVo;
+import com.blog.enums.AppHttpCodeEnum;
 import com.blog.mapper.MenuMapper;
 import com.blog.service.MenuService;
+import com.blog.utils.BeanCopyPropertiesUtils;
+import com.blog.utils.ResponseResult;
 import com.blog.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
-
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +79,66 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         return childrenList;
     }
 
+    @Override
+    public ResponseResult getMenuList(String status, String menuName) {
+        //1.根据menu状态和menuName查询
+        LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StringUtils.hasText(status), Menu::getStatus, status)
+                .like(StringUtils.hasText(menuName), Menu::getMenuName, menuName)
+                .orderByAsc(Menu::getParentId, Menu::getOrderNum);
+        List<Menu> menuList = list(wrapper);
+        //2.将List<Menu>对象转换为List<MenuVo>对象
+        List<MenuVo> menuVos = BeanCopyPropertiesUtils.copyBeanList(menuList, MenuVo.class);
+        return ResponseResult.okResult(menuVos);
+    }
+
+    @Override
+    public ResponseResult addMenu(Menu menu) {
+        LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Menu::getMenuName, menu.getMenuName());
+        Menu one = getOne(wrapper);
+        if (!ObjectUtils.isEmpty(one)) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.MENU_ADD_ERROR);
+        }
+        save(menu);
+        return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult getMenuById(Long id) {
+        LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Menu::getId, id);
+        Menu menu = getOne(wrapper);
+        MenuVo menuVo = BeanCopyPropertiesUtils.copyBean(menu, MenuVo.class);
+        return ResponseResult.okResult(menuVo);
+    }
+
+    @Override
+    public ResponseResult updateMenu(Menu menu) {
+        if (!StringUtils.hasText(menu.getMenuName()) ||
+                !StringUtils.hasText(menu.getMenuType()) ||
+                !StringUtils.hasText(String.valueOf(menu.getStatus())) ||
+                !StringUtils.hasText(menu.getPath()) ||
+                !StringUtils.hasText(String.valueOf(menu.getOrderNum())) ||
+                !StringUtils.hasText(menu.getIcon())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.CONTENT_IS_BLANK);
+        }
+        updateById(menu);
+        return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult deleteMenu(Long id) {
+        //1.查询当前菜单是否有子菜单，如果有就不允许删除
+        LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Menu::getParentId, id);
+        List<Menu> list = list(wrapper);
+        if (!ObjectUtils.isEmpty(list) && list.size() != 0){
+            return ResponseResult.errorResult(AppHttpCodeEnum.DELETE_MENU_REFUSE);
+        }
+        removeById(id);
+        return ResponseResult.okResult();
+    }
 
 }
 

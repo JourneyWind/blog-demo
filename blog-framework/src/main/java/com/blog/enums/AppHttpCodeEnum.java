@@ -22,7 +22,10 @@ public enum AppHttpCodeEnum {
     LOGIN_ERROR(505,"用户名或密码错误"),
     UPDATE_USERINFO_ERR(514,"个人信息更新失败"),
     TAG_IS_EXIST(515,"标签已存在"),
-    ARTICLE_IS_NOT_EXIST(516,"文章不存在");
+    ARTICLE_IS_NOT_EXIST(516,"文章不存在"),
+    MENU_ADD_ERROR(517,"菜单添加失败"),
+    CONTENT_IS_BLANK(518,"菜单有内容为空"),
+    DELETE_MENU_REFUSE(519,"存在子菜单不允许删除");
 
     int code;
     String msg;
