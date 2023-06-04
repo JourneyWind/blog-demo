@@ -88,7 +88,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional
     public ResponseResult updateRole(Role role) {
-        updateRole(role);
+        LambdaQueryWrapper<Role> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Role::getId,role.getId());
+        update(role, lambdaQueryWrapper);
         LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();
         Long roleId = role.getId();
         wrapper.eq(RoleMenu::getRoleId, roleId);
@@ -102,7 +104,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public ResponseResult deleteRole(Long id) {
         //1.首先移除当前角色所关联的sys_role_menu表数据
-        roleMenuService.removeById(id);
+        LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RoleMenu::getRoleId,id);
+        roleMenuService.remove(wrapper);
         //2.根据id移除角色
         removeById(id);
         return ResponseResult.okResult();
