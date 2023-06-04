@@ -43,4 +43,23 @@ public class MenuController {
     public ResponseResult deleteMenu(@PathVariable Long id){
         return menuService.deleteMenu(id);
     }
+
+    /**
+     * 新增角色前查询菜单树
+     * @return
+     */
+    @GetMapping("/treeselect")
+    public ResponseResult getMenuTree(){
+        return menuService.getMenuTree();
+    }
+
+    /**
+     * 角色菜单treeselect
+     * @param id id
+     * @return {@link ResponseResult}
+     */
+    @GetMapping("/roleMenuTreeselect/{id}")
+    public ResponseResult roleMenuTreeselect(@PathVariable Long id){
+        return menuService.roleMenuTreeselect(id);
+    }
 }

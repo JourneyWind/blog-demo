@@ -5,16 +5,22 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.constants.CommonConstants;
 import com.blog.domain.entity.Menu;
+import com.blog.domain.entity.RoleMenu;
+import com.blog.domain.vo.MenuTreeVo;
 import com.blog.domain.vo.MenuVo;
+import com.blog.domain.vo.RoleMenuTreeSelectVo;
 import com.blog.enums.AppHttpCodeEnum;
 import com.blog.mapper.MenuMapper;
 import com.blog.service.MenuService;
+import com.blog.service.RoleMenuService;
 import com.blog.utils.BeanCopyPropertiesUtils;
 import com.blog.utils.ResponseResult;
 import com.blog.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +29,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
-
+    @Resource
+    private RoleMenuService roleMenuService;
 
     @Override
     public List<String> selectPermsByUserId(Long id) {
@@ -133,13 +140,55 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Menu::getParentId, id);
         List<Menu> list = list(wrapper);
-        if (!ObjectUtils.isEmpty(list) && list.size() != 0){
+        if (!ObjectUtils.isEmpty(list) && list.size() != 0) {
             return ResponseResult.errorResult(AppHttpCodeEnum.DELETE_MENU_REFUSE);
         }
         removeById(id);
         return ResponseResult.okResult();
     }
 
+    @Override
+    public ResponseResult getMenuTree() {
+        LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Menu::getStatus, CommonConstants.MENU_STATUS_NORMAL);
+        wrapper.in(Menu::getMenuType, CommonConstants.MENU, CommonConstants.DIRECTORY);
+        List<Menu> list = list(wrapper);
+        List<MenuTreeVo> menuTreeVoList = buildMenuSelectTree(list);
+        return ResponseResult.okResult(menuTreeVoList);
+    }
+
+    private List<MenuTreeVo> buildMenuSelectTree(List<Menu> menuList) {
+        List<MenuTreeVo> menuTreeVoList = menuList.stream()
+                .map(menu -> new MenuTreeVo(menu.getId(), menu.getMenuName(), menu.getParentId(), null))
+                .collect(Collectors.toList());
+        List<MenuTreeVo> list = menuTreeVoList.stream()
+                .filter(menuTreeVo -> menuTreeVo.getParentId().equals(0L))
+                .map(menuTreeVo -> menuTreeVo.setChildren(getMenuSelectTreeChildren(menuTreeVo, menuTreeVoList)))
+                .collect(Collectors.toList());
+        return list;
+    }
+
+    private List<MenuTreeVo> getMenuSelectTreeChildren(MenuTreeVo menuTreeVo, List<MenuTreeVo> menuList) {
+        List<MenuTreeVo> collect = menuList.stream()
+                .filter(m -> m.getParentId().equals(menuTreeVo.getId()))
+                .map(m -> m.setChildren(getMenuSelectTreeChildren(m, menuList)))
+                .collect(Collectors.toList());
+        return collect;
+    }
+
+    @Override
+    public ResponseResult roleMenuTreeselect(Long id) {
+        ResponseResult responseResult = getMenuTree();
+        List<MenuTreeVo> list = (List<MenuTreeVo>) responseResult.getData();
+        LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RoleMenu::getRoleId, id);
+        List<RoleMenu> menuList = roleMenuService.list(wrapper);
+        List<Long> collect = menuList.stream()
+                .map(rm -> rm.getMenuId())
+                .collect(Collectors.toList());
+        RoleMenuTreeSelectVo roleMenuTreeSelectVo = new RoleMenuTreeSelectVo(collect, list);
+        return ResponseResult.okResult(roleMenuTreeSelectVo);
+    }
 }
 
 
