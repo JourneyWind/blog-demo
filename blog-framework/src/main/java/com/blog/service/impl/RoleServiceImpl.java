@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.blog.constants.CommonConstants;
 import com.blog.domain.dto.RoleDto;
 import com.blog.domain.entity.Role;
 import com.blog.domain.entity.RoleMenu;
@@ -110,6 +111,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         //2.根据id移除角色
         removeById(id);
         return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult listAllRole() {
+        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Role::getStatus, CommonConstants.STATUS_NORMAL);
+        List<Role> list = list(wrapper);
+        return ResponseResult.okResult(BeanCopyPropertiesUtils.copyBeanList(list,RoleVo.class));
     }
 
 

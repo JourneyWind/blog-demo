@@ -109,4 +109,6 @@ public class CommonConstants {
 
     public static final String VIEW_COUNT_KEY = "viewcount";
 
+    public static final String STATUS_NORMAL = "0";
+
 }

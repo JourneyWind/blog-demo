@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * 标签(Tag)表实体类
- */
+
 @SuppressWarnings("serial")
 @Data
 @AllArgsConstructor
