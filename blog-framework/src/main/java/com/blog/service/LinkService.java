@@ -1,6 +1,7 @@
 package com.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.blog.domain.dto.AdminLinkDto;
 import com.blog.domain.entity.Link;
 import com.blog.utils.ResponseResult;
 
@@ -12,16 +13,14 @@ import com.blog.utils.ResponseResult;
 public interface LinkService extends IService<Link> {
 
     ResponseResult getAllLink();
-//
-//    ResponseResult getAllLinkByAdmin(Integer pageNum, Integer pageSize, LinkDto linkDto);
-//
-//    ResponseResult addLink(AddLinkDto addLinkDto);
-//
-//    ResponseResult deleteLink(Long id);
-//
-//    ResponseResult getLinkOneById(Long id);
-//
-//    ResponseResult updateLink(LinkDto linkDto);
-//
-//    ResponseResult updateLinkStatus(LinkStatusDto linkStatusDto);
+
+    ResponseResult getAllLinkByAdmin(Integer pageNum, Integer pageSize, String name, String status);
+
+    ResponseResult addLink(AdminLinkDto addLinkDto);
+
+    ResponseResult getLinkOneById(Long id);
+
+    ResponseResult updateLink(AdminLinkDto linkDto);
+
+    ResponseResult deleteLink(Long id);
 }

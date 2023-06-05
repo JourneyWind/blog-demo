@@ -28,7 +28,9 @@ public enum AppHttpCodeEnum {
     DELETE_MENU_REFUSE(519,"存在子菜单不允许删除"),
     USER_RESIGN_NULL(520,"用户注册信息有空"),
     CATEGORY_IS_EXIST(521,"分类已存在"),
-    DELETE_CATEGORY_FAIL(522, "删除分类失败");
+    DELETE_CATEGORY_FAIL(522, "删除分类失败"),
+    LINK_IS_EXIST(523, "友链已存在"),
+    DELETE_LINK_FAIL(524, "删除友链失败");
 
     int code;
     String msg;
