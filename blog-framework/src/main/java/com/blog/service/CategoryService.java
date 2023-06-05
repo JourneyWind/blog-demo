@@ -1,7 +1,9 @@
 package com.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.blog.domain.dto.CategoryDto;
 import com.blog.domain.entity.Category;
+import com.blog.domain.vo.CategoryAdminVo;
 import com.blog.utils.ResponseResult;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,4 +19,14 @@ public interface CategoryService extends IService<Category> {
     ResponseResult listAllCategory();
 
     void excelExport(HttpServletResponse response);
+
+    ResponseResult categoryList(Integer pageNum, Integer pageSize, String name, String status);
+
+    ResponseResult addCategory(CategoryDto categoryDto);
+
+    ResponseResult getCategoryOneById(Long id);
+
+    ResponseResult updateCategory(CategoryAdminVo categoryAdminVo);
+
+    ResponseResult deleteCategory(Long id);
 }

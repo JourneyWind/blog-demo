@@ -26,7 +26,9 @@ public enum AppHttpCodeEnum {
     MENU_ADD_ERROR(517,"菜单添加失败"),
     CONTENT_IS_BLANK(518,"菜单有内容为空"),
     DELETE_MENU_REFUSE(519,"存在子菜单不允许删除"),
-    USER_RESIGN_NULL(520,"用户注册信息有空");
+    USER_RESIGN_NULL(520,"用户注册信息有空"),
+    CATEGORY_IS_EXIST(521,"分类已存在"),
+    DELETE_CATEGORY_FAIL(522, "删除分类失败");
 
     int code;
     String msg;
